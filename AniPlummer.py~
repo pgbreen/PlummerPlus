@@ -212,7 +212,7 @@ if args.q != 0:
 				print r[i], fmax, E, l, 
 				raise NameError('Failed to sample')
 
-	print float(rvc)/float(len(rvf))
+	#print float(rvc)/float(len(rvf))
 
 			
 # anisotropoic plummer Osipkov-Merritt radial only Osipkov 1979; Merritt 1985
@@ -296,10 +296,6 @@ elif  args.ra != 0:
 			if loopc > 10000:
 				print r[i], fmax, E, l, 
 				raise NameError('Failed to sample')
-
-			
-
-
 
 #Einstein sphere
 elif args.e:
@@ -437,7 +433,20 @@ for i in xrange(args.n):
 	svr2 += w[i,0]*vr**2
 	svt2 += w[i,0]*vt**2
 
-print " rh = {} K.E. = {} vt^2 = {} vr^2 = {} ".format(lfact*np.median(r),0.5*(svt2+svr2) ,svt2,svr2)
+if args.ms[0] == 0:
+	rh = lfact*np.median(r)
+else:
+	r2 = np.sum(np.power(w[:,1:4],2), axis=1)
+	indx = sorted(range(args.n),key=lambda k: r2[k])
+	mc = 0.0 
+	for i in xrange(args.n):
+		mc += w[indx[i],0]
+		print sqrt(r2[indx[i]]), w[indx[i],0]
+		if mc >= 0.5:
+			rh = sqrt(r2[indx[i]])
+			break
+
+print " rh = {} K.E. = {} vt^2 = {} vr^2 = {} ".format(rh,0.5*(svt2+svr2) ,svt2,svr2)
 if not args.e:
 	print " 1-0.5*<vt^2>/<vr^2> = {} ".format(1.0 - 0.5*svt2/svr2)
 	print " 2.0Tr/Tw = {} (Polyachenko and Shukhman 1.7 +/- 0.25) ".format(2.0*svr2/svt2)
