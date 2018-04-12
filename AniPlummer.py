@@ -107,17 +107,26 @@ w[:,1:4] = w[:,1:4]*r[:,None]
 #---------------------------------generate velocities------------------------------------
 
 #calucates orthogonal basis using r and returns random vr,vt units (need of anisotorpic models)
-sign = [-1.0,1.0]
-def unitv(ri):
-	ru = ri/np.linalg.norm(ri)
-	e1 = [ri[1],-ri[0],0.0]
-        e1 /= np.linalg.norm(e1)
-	e2 = np.cross(ru,e1)
-	theta = 2.0*pi*np.random.rand()
-	vr = ru*sign[np.random.randint(2)] 
-	vt = (e1*cos(theta) + e2*sin(theta))
-	return vr,vt
-
+if args.q != 0 	or args.ra != 0:
+	sign = [-1.0,1.0]
+	theta = 2.0*pi*np.random.rand(args.n)
+	ctheta = np.cos(theta)
+	stheta = np.sin(theta)
+	rbit = np.random.randint(2, size=args.n)
+	ui = 0
+	def unitv(ri):
+		ru = ri/np.linalg.norm(ri)
+		e1 = [ri[1],-ri[0],0.0]
+		e1 /= np.linalg.norm(e1)
+		e2 = np.cross(ru,e1)
+		#theta = 2.0*pi*np.random.rand()
+		#vr = ru*sign[np.random.randint(2)] 
+		#vt = (e1*cos(theta) + e2*sin(theta))
+		vr = ru*sign[rbit[unitv.i]] 
+		vt = (e1*ctheta[unitv.i] + e2*stheta[unitv.i])
+		unitv.i += 1
+		return vr,vt
+	unitv.i = 0
 
 
 #anisotropoic plummer Dejonghe
@@ -182,13 +191,12 @@ if args.q != 0:
 	fmaxv = psimax(psi)
 	vmax = np.sqrt(2.0*psi)
 	v = np.zeros(args.n)	
-	rvf =  np.random.rand(int(round(100*args.n)))
+	rvf =  np.random.rand(int(round(50*args.n)))
 	rvc = 0
 	for i in xrange(args.n):
 		fmax = fmaxv[i]
 		loopc = 0
 		while True:
-			rvc+=3
 			#rv =  np.random.rand(3)
 			vr =  rvf[rvc+0]*vmax[i]
 			vt =  rvf[rvc+1]*vmax[i]
@@ -197,22 +205,30 @@ if args.q != 0:
 			E =  psi[i] - 0.5*vsq
 
 			if E < 0:
-				continue
-			
+				rvc+=2
+				continue			
+
 			f1 =  rvf[rvc+2]*fmax
 			f = Fq(E,l)*vt
 
+			rvc += 3
+			
 			if f >= f1:  
 			#	print i,loopc
 				vrv,vtv = unitv(w[i,1:4])
 				w[i,4:] = vrv*vr+vtv*vt
 				break
+
+			if rvc == len(rvf):
+				rvf = np.random.rand(int(round(50*args.n)))
+				rvc = 0		
+
 			loopc += 1
 			if loopc > 10000:
 				print r[i], fmax, E, l, 
 				raise NameError('Failed to sample')
 
-	#print float(rvc)/float(len(rvf))
+	#print float(rvc)/float(len(rvf)),rvc,len(rvf),i
 
 			
 # anisotropoic plummer Osipkov-Merritt radial only Osipkov 1979; Merritt 1985
@@ -268,7 +284,7 @@ elif  args.ra != 0:
 	fmaxv = psimax(psi)
 	vmax = np.sqrt(2.0*psi)
 	v = np.zeros(args.n)	
-	rvf =  np.random.rand(int(round(100*args.n)))
+	rvf =  np.random.rand(int(round(40*args.n)))
 	rvc = 0
 	for i in xrange(args.n):
 		fmax = fmaxv[i]
@@ -296,6 +312,7 @@ elif  args.ra != 0:
 			if loopc > 10000:
 				print r[i], fmax, E, l, 
 				raise NameError('Failed to sample')
+	print float(rvc)/float(len(rvf))
 
 #Einstein sphere
 elif args.e:
@@ -450,7 +467,7 @@ if not args.e:
 	print " 1-0.5*<vt^2>/<vr^2> = {} ".format(1.0 - 0.5*svt2/svr2)
 	print " 2.0Tr/Tw = {} (Polyachenko and Shukhman 1.7 +/- 0.25) ".format(2.0*svr2/svt2)
 
-if args.a > 0:
+if args.a > 0 or args.oa[0] > 0:
 	L = np.multiply(w[:,0,None],np.cross(w[:,1:4],w[:,4:]))
 	L = np.sum(L, axis=0)
 	print " L = [{},{},{}]  |L|={} nf={}".format(L[0],L[1],L[2],np.linalg.norm(L),countflip )
