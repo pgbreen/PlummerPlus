@@ -74,6 +74,7 @@ parser.add_argument("-oa", help="Offset angle in degrees for particles below ene
 
 parser.add_argument("-ms", help="Mass segregated model, set fraction of total mass (MF) and mass ratio (MR). This will reduce number of particles see Readme file. ",type=float,default=[0,0],metavar=("MF","MR"),nargs=2)
 
+parser.add_argument("-lzr", help="Lz range lower upper ",type=float,default=[0,0],metavar=("L","H"),nargs=2)
 
 # exclusice arguments for velocity space
 group = parser.add_mutually_exclusive_group()
@@ -365,7 +366,7 @@ if args.oa[2] >= 0.0:
 	# general trick energy cut and 
 	E = 0.5*np.power(v,2.0) - np.reciprocal(np.sqrt(np.power(x,2.0) + 1.0))
 	ecut = np.percentile(E, 100.0*args.oa[2])
-
+	
 #if args.oa[0] > 0:
 	theta = pi*args.oa[0]/180.0
 	ov = np.array([0.0,sin(theta ),cos(theta )])
@@ -381,6 +382,17 @@ if args.oa[2] >= 0.0:
 				if args.oa[1] > np.random.rand():
 					w[i,4:] *= -1.0
 					countflip+=1
+elif args.lzr[0] > 0 or args.lzr[1] > 0:
+	countflip = 0
+	L = np.cross(w[:,1:4],w[:,4:])
+	#wnorm = float(len(L[:,2]))
+	for i in xrange(args.n):
+		if L[i,2] < 0.0 and abs(L[i,2]) < args.lzr[1]  and abs(L[i,2])  > args.lzr[0] :
+			
+			if args.a > np.random.rand():
+				w[i,4:] *= -1.0
+				countflip += 1
+		
 
 elif args.a > 0:
 	#basic LB trick 
@@ -423,6 +435,7 @@ if args.ms[0] > 0 and args.ms[1] > 0:
 	
 
 
+
 #--------------------------------scale to Henon units and save data--------------------------------
 
 # scale to henon units and save data to output file "fort.10" (use -o to rename output)
@@ -430,7 +443,7 @@ lfact=(3.0*pi)/16.0
 vfact = 1.0/sqrt(lfact)
 w[:,1:4] *= lfact
 w[:,4:] *= vfact
-
+print ecut, ecut*vfact**2, lfact
 np.savetxt(args.o, w)
 
 # statistics 
@@ -479,7 +492,26 @@ if True:
 
 #if args.a > 0 or args.oa[0] > 0:
 	L = np.multiply(w[:,0,None],np.cross(w[:,1:4],w[:,4:]))
+	#np.savetxt("Ldat",L)
+	#r = np.sqrt(r2)
+	#indx = sorted(range(args.n),key=lambda k: r[k])
+	#nbin =100
+	#rl = []
+	#nc,slz = 0,0.0
+	#for i in range(len(r)):
+	#	pid = indx[i]
+	#	nc += 1
+	#	rl.append(r[pid])
+	#	slz += abs(L[pid,2])
+	#	if nc == nbin:
+	#		print np.median(rl), float(len(r))*slz/float(nc)
+	#		rl = []
+	#		nc,slz = 0,0.0
+			
+	
 	L = np.sum(L, axis=0)
+	
+	
 	print " L = [{},{},{}]  |L|={} nf={}".format(L[0],L[1],L[2],np.linalg.norm(L),countflip )
 
 #
@@ -513,12 +545,12 @@ for rl in Rbins:
 	#print R2[rl[0]],R2[rl[-1]]
 	for zl in zbins:
 		
-		print "{:.2e}".format(zi[zl[-1]]),
+		#print "{:.2e}".format(zi[zl[-1]]),
 		vphiavg = np.sum(vphi[rl[zl]])
 		vsign = sign(vphiavg)
 		#mass = np.sum(w[rl[zl],0])
 		vphike += vsign*(vphiavg**2)/len(zl)
-	print ""
+	#print ""
 
 
 print " T_phi/|pot| = {}, (assuming pot = 0.5)".format(vphike/args.n)
