@@ -48,6 +48,7 @@
 import argparse
 import numpy as np
 import scipy.special as sci
+import sys
 from scipy.interpolate import interp1d
 from math import pi, sqrt, cos, sin
 
@@ -399,7 +400,7 @@ if args.hs:
 		Lzc += Lz[pid]
 		if Lzc >= 0.5*Lztot:
 			ecut = E[pid]
-			print i/float(args.n)
+			#print i/float(args.n)
 			break
 	for i in xrange(args.n):
 		if L[i,2] < 0.0 and E[i] < ecut:
@@ -474,7 +475,7 @@ else:
  	name = " Isotropic"
 
 
-print "\n{} Plummer model with N = {}  ".format(name, args.n )
+print "\n{} Plummer model with N = {}  (random seed {})".format(name, args.n, args.rs )
 
 
 svr2 = 0.0
@@ -552,6 +553,14 @@ for rl in Rbins:
 
 
 print " T_phi/|pot| = {:.3e}, (assuming pot = 0.5)".format(-1.0*vphike/args.n)
-print "\n"
 
+if args.hs:
+	commandstring = '\n';  
+	for arg in sys.argv:          # skip sys.argv[0] since the question didn't ask for it
+	    if ' ' in arg:
+	        commandstring+= '"{}"  '.format(arg) ;   # Put the quotes back in
+	    else:
+	        commandstring+="{}  ".format(arg) ;      # Assume no space => no quotes
+	print(commandstring); 	
+print ""
 
