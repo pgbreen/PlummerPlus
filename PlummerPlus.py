@@ -86,6 +86,11 @@ group.add_argument("-ra", help="anisotropic radius of Osipkov-Merritt radially a
 group.add_argument("-e", help=" Einstein sphere, plummer model with only circular orbits ",
                     action="store_true")
 
+
+group.add_argument("-hs", help=" High shear model, calculate energy cut such that Lz=0",
+                    action="store_true")
+
+
 args = parser.parse_args()
 
 np.random.seed(args.rs)
@@ -382,6 +387,31 @@ if args.oa[2] >= 0.0:
 					w[i,4:] *= -1.0
 					countflip+=1
 
+if args.hs:
+	E = 0.5*np.power(v,2.0) - np.reciprocal(np.sqrt(np.power(x,2.0) + 1.0))
+	L = np.cross(w[:,1:4],w[:,4:])
+	Lz = abs(L[:,2])	
+	Lztot = sum(Lz)
+	indx = sorted(range(args.n),key=lambda k: E[k])
+	Lzc = 0.0	
+	for i in xrange(args.n):
+		pid = indx[i]
+		Lzc += Lz[pid]
+		if Lzc >= 0.5*Lztot:
+			ecut = E[pid]
+			#print i/float(args.n)
+			break
+	for i in xrange(args.n):
+		if L[i,2] < 0.0 and E[i] < ecut:
+			if args.a > np.random.rand():
+				w[i,4:] *= -1.0
+				countflip+=1
+
+		if L[i,2] > 0.0 and E[i] > ecut:
+			if args.a > np.random.rand():
+				w[i,4:] *= -1.0
+				countflip+=1
+	
 elif args.a > 0:
 	#basic LB trick 
 	countflip = 0
