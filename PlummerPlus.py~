@@ -75,6 +75,8 @@ parser.add_argument("-oa", help="Offset angle in degrees for particles below ene
 
 parser.add_argument("-ms", help="Mass segregated model, set fraction of total mass (MF) and mass ratio (MR). This will reduce number of particles see Readme file. ",type=float,default=[0,0],metavar=("MF","MR"),nargs=2)
 
+parser.add_argument("-hs", help=" defines energy cut hs*pot(0) for counter rotation ",
+                   type=float,default=0,metavar="")
 
 # exclusice arguments for velocity space
 group = parser.add_mutually_exclusive_group()
@@ -88,9 +90,15 @@ group.add_argument("-e", help=" Einstein sphere, plummer model with only circula
                     action="store_true")
 
 
-group.add_argument("-hs", help=" High shear model, calculate energy cut such that Lz=0",
-                    action="store_true")
 
+
+
+#-------- Python3 compatibility
+try:
+    xrange
+except NameError:
+    xrange = range
+#----------------------
 
 args = parser.parse_args()
 
@@ -168,7 +176,7 @@ if args.q != 0:
 		assert E > 0
 		return const3  * (E**(3.5-args.q)) * H(0.0, 0.5*args.q, 4.5-args.q, 1.0, (L**2.0) / (2.0*E))
 
- 	sf = 1.1 	# increase fmax found on grid by sf
+	sf = 1.1 	# increase fmax found on grid by sf
 	steps = 100.0 	# step size in velocity space vmax/steps
 	def maxfq(psi,r):
 		maxfq = 0.0
@@ -239,7 +247,7 @@ if args.q != 0:
 
 			loopc += 1
 			if loopc > 10000:
-				print r[i], fmax, E, l, 
+				print(r[i], fmax, E, l) 
 				raise NameError('Failed to sample')
 
 	#print float(rvc)/float(len(rvf)),rvc,len(rvf),i
@@ -324,7 +332,7 @@ elif  args.ra != 0:
 				break
 			loopc += 1
 			if loopc > 10000:
-				print r[i], fmax, E, l, 
+				print(r[i], fmax, E, l) 
 				raise NameError('Failed to sample')
 	#print float(rvc)/float(len(rvf))
 
@@ -388,20 +396,25 @@ if args.oa[2] >= 0.0:
 					w[i,4:] *= -1.0
 					countflip+=1
 
-if args.hs:
+if args.hs != 0.0:
+
 	E = 0.5*np.power(v,2.0) - np.reciprocal(np.sqrt(np.power(x,2.0) + 1.0))
 	L = np.cross(w[:,1:4],w[:,4:])
-	Lz = abs(L[:,2])	
-	Lztot = sum(Lz)
-	indx = sorted(range(args.n),key=lambda k: E[k])
-	Lzc = 0.0	
-	for i in xrange(args.n):
-		pid = indx[i]
-		Lzc += Lz[pid]
-		if Lzc >= 0.5*Lztot:
-			ecut = E[pid]
-			#print i/float(args.n)
-			break
+
+	# calculation for Lz = 0 high shear models, no long used
+	#Lz = abs(L[:,2])	
+	#Lztot = sum(Lz)
+	#indx = sorted(range(args.n),key=lambda k: E[k])
+	#Lzc = 0.0	
+	#for i in xrange(args.n):
+	#	pid = indx[i]
+	#	Lzc += Lz[pid]
+	#	if Lzc >= 0.5*Lztot:
+	#		ecut = E[pid]
+	#		break
+
+	ecut = -1.0*args.hs #pot(0)=1.0
+	
 	for i in xrange(args.n):
 		if L[i,2] < 0.0 and E[i] < ecut:
 			if args.a > np.random.rand():
@@ -444,7 +457,7 @@ if args.ms[0] > 0 and args.ms[1] > 0:
 			else:
 				
 				rl.append(i)
-	print "\n Warning mass segregation particle number reduced n = {}!".format(args.n-len(rl))
+	print("\n Warning mass segregation particle number reduced n = {}!".format(args.n-len(rl)))
 		
 	w=np.delete(w,rl,axis=0)
 	# reset n and renormlise mass to account for round error
@@ -475,7 +488,7 @@ else:
  	name = " Isotropic"
 
 
-print "\n{} Plummer model with N = {}  (random seed {})".format(name, args.n, args.rs )
+print("\n{} Plummer model with N = {}  (random seed {})".format(name, args.n, args.rs ))
 
 
 svr2 = 0.0
@@ -502,16 +515,16 @@ else:
 			rh = sqrt(r2[indx[i]])
 			break
 
-print " rh = {:.3e} K.E. = {:.3e} vt^2 = {:.3e} vr^2 = {:.3e} ".format(rh,0.5*(svt2+svr2) ,svt2,svr2)
+print(" rh = {:.3e} K.E. = {:.3e} vt^2 = {:.3e} vr^2 = {:.3e} ".format(rh,0.5*(svt2+svr2) ,svt2,svr2))
 if True:
 #if not args.e:
-	print " 1-0.5*<vt^2>/<vr^2> = {:.3e} ".format(1.0 - 0.5*svt2/svr2)
-	print " 2.0Tr/Tp = {:.3} (Polyachenko and Shukhman 1973, crit value 1.7 +/- 0.25) ".format(2.0*svr2/svt2)
+	print(" 1-0.5*<vt^2>/<vr^2> = {:.3e} ".format(1.0 - 0.5*svt2/svr2))
+	print(" 2.0Tr/Tp = {:.3} (Polyachenko and Shukhman 1973, crit value 1.7 +/- 0.25) ".format(2.0*svr2/svt2))
 
 #if args.a > 0 or args.oa[0] > 0:
 	L = np.multiply(w[:,0,None],np.cross(w[:,1:4],w[:,4:]))
 	L = np.sum(L, axis=0)
-	print " L = [{:.3e},{:.3e},{:.3e}]  |L|={:.3e} nf={}".format(L[0],L[1],L[2],np.linalg.norm(L),countflip )
+	print(" L = [{:.3e},{:.3e},{:.3e}]  |L|={:.3e} nf={}".format(L[0],L[1],L[2],np.linalg.norm(L),countflip ))
 
 #
 # bins size, number of rings nbin^2, for nbin=10 each ring contains 1% mass
@@ -552,15 +565,15 @@ for rl in Rbins:
 	#print ""
 
 
-print " T_phi/|pot| = {:.3e}, (assuming pot = 0.5)".format(-1.0*vphike/args.n)
+print(" T_phi/|pot| = {:.3e}, (assuming pot = 0.5)".format(-1.0*vphike/args.n))
 
-if args.hs:
-	commandstring = '\n';  
-	for arg in sys.argv:          # skip sys.argv[0] since the question didn't ask for it
-	    if ' ' in arg:
-	        commandstring+= '"{}"  '.format(arg) ;   # Put the quotes back in
-	    else:
-	        commandstring+="{}  ".format(arg) ;      # Assume no space => no quotes
-	print(commandstring); 	
-print ""
+#print command arguments
+commandstring = '\n';  
+for arg in sys.argv:          
+    if ' ' in arg:
+        commandstring+= '"{}"  '.format(arg) ;  
+    else:
+        commandstring+="{}  ".format(arg) ;      
+print(commandstring+"\n"); 	
+
 
