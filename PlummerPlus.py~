@@ -241,12 +241,12 @@ if args.q != 0:
 				w[i,4:] = vrv*vr+vtv*vt
 				break
 
-			if rvc == len(rvf):
+			if rvc + 4 <= len(rvf):
 				rvf = np.random.rand(int(round(50*args.n)))
 				rvc = 0		
 
 			loopc += 1
-			if loopc > 10000:
+			if loopc > 100000:
 				print(r[i], fmax, E, l) 
 				raise NameError('Failed to sample')
 
@@ -412,7 +412,8 @@ if args.hs != 0.0:
 	#	if Lzc >= 0.5*Lztot:
 	#		ecut = E[pid]
 	#		break
-
+	#print(ecut)
+	#exit()
 	ecut = -1.0*args.hs #pot(0)=1.0
 	
 	for i in xrange(args.n):
@@ -567,8 +568,12 @@ for rl in Rbins:
 
 print(" T_phi/|pot| = {:.3e}, (assuming pot = 0.5)".format(-1.0*vphike/args.n))
 
+if args.oa[2] >= 0.0:
+	print(" Gamma = {:.3e} ".format(abs(ecut)))
+
+
 #print command arguments
-commandstring = '\n';  
+commandstring = '\n ';  
 for arg in sys.argv:          
     if ' ' in arg:
         commandstring+= '"{}"  '.format(arg) ;  
