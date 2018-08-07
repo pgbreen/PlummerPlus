@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# PROGRAM: AniPlummer.py 
+# PROGRAM: PlummerPlus.py 
 #
 # Description: Generates realisation of anisotropic and rotating models with plummer model density distribution
 # 		Note on units G=M=a=1 for generation but values are rescales to Henon units for output 
@@ -15,35 +15,35 @@
 # CITATION: Please use Breen, Varri, Heggie 2018 (https://arxiv.org/abs/)
 #
 # EXAMPLES:
-#       use "chmod a+x AniPlummer.py" to make script executable, alternativaly use "python AniPlummer.py ...."
+#       use "chmod a+x PlummerPlus.py" to make script executable, alternativaly use "python PlummerPlus.py ...."
 #
 # 	isotropic plummmer with 8K particles  
-#	./AniPlummer.py -n 8192
+#	./PlummerPlus.py -n 8192
 #
 #	8k anisotropic plummer with Dejonghe with q=-2 (see http://adsabs.harvard.edu/full/1987MNRAS.224...13D) 
-#	./AniPlummer.py -n 8192 -q -2
+#	./PlummerPlus.py -n 8192 -q -2
 #
 # 	8k Osipkov-Merritt  radially anisotropic plummer with anisotropic radius ra=1.0 (see e.g. merritt, d. 1985. aj, 90, 1027)
-#	./AniPlummer.py -n 8192 -ra 1.0
+#	./PlummerPlus.py -n 8192 -ra 1.0
 #
 #	8k Einstien shpere i.e. plummer model with only ciruclar orbits
-#	./AniPlummer.py -n 8192 -e
+#	./PlummerPlus.py -n 8192 -e
 #
 #	8K isotropic plummmer with rotation via Lyden-Bell trick i.e. reverse velocities of 50% particles with L_z < 0
-#       ./AniPlummer.py -n 8192 -a 0.5
+#       ./PlummerPlus.py -n 8192 -a 0.5
 # 
 #	8K isotropic plummmer with offset rotation, 50% of the most bound stars rotating about z-axis 
 # 	least bound 50% rotating is offset by 90 degres (i.e. about y-axis). 
 #       Note most stars use -a for the fraction of stars reverse where as least bount stars use second value in -oa flag (i.e. -oa angle flipfraction)
-#       ./AniPlummer.py -n 8192 -a 1.0  -oa 90.0 1.0 0.5
+#       ./PlummerPlus.py -n 8192 -a 1.0  -oa 90.0 1.0 0.5
 #
 # 	for a high shear model, set offset to 180 degree (i.e. -z) and used mass fraction 0.67 (i.e. rotatin model with 0 net L!) 
-# 	./AniPlummer.py -n 10000  -a 1.0 -oa 180.0 1.0 0.67
+# 	./PlummerPlus.py -n 10000  -a 1.0 -oa 180.0 1.0 0.67
 #
 #	create mass segrated model most bound 50% of the mass consisting of particles 10.0 times more massive then the least
-#	./AniPlummer.py -n 10000 -ms 0.5 10.0
+#	./PlummerPlus.py -n 10000 -ms 0.5 10.0
 #
-""" AniPlummer.py: generates realisation of anisotropic and rotating models with plummer model density distribution """
+""" PlummerPlus.py: generates realisation of anisotropic and rotating models with plummer model density distribution """
 
 import argparse
 import numpy as np
@@ -569,7 +569,7 @@ for rl in Rbins:
 print(" T_phi/|pot| = {:.3e}, (assuming pot = 0.5)".format(-1.0*vphike/args.n))
 
 if args.oa[2] >= 0.0:
-	print(" Gamma = {:.3e} ".format(abs(ecut)))
+	print(" Gamma = {:.3e} (|Ecut/Emin|) ".format(abs(ecut)))
 
 
 #print command arguments

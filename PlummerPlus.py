@@ -241,7 +241,7 @@ if args.q != 0:
 				w[i,4:] = vrv*vr+vtv*vt
 				break
 
-			if rvc + 4 <= len(rvf):
+			if rvc + 4 >= len(rvf):
 				rvf = np.random.rand(int(round(50*args.n)))
 				rvc = 0		
 
@@ -569,7 +569,7 @@ for rl in Rbins:
 print(" T_phi/|pot| = {:.3e}, (assuming pot = 0.5)".format(-1.0*vphike/args.n))
 
 if args.oa[2] >= 0.0:
-	print(" Gamma = {:.3e} ".format(abs(ecut)))
+	print(" Gamma = {:.3e} (|Ecut/Emin|) ".format(abs(ecut)))
 
 
 #print command arguments
