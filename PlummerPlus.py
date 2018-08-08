@@ -379,24 +379,24 @@ if args.oa[2] >= 0.0:
 	# general trick energy cut and 
 	E = 0.5*np.power(v,2.0) - np.reciprocal(np.sqrt(np.power(x,2.0) + 1.0))
 	ecut = np.percentile(E, 100.0*args.oa[2])
-
 #if args.oa[0] > 0:
 	theta = pi*args.oa[0]/180.0
-	ov = np.array([0.0,sin(theta ),cos(theta )])
+	ov = np.array([0.0,sin(theta),cos(theta)])
 	L = np.cross(w[:,1:4],w[:,4:])	
 	
 	for i in xrange(args.n):	
 		if L[i,2] < 0.0 and E[i] < ecut:
-			if args.a > np.random.rand():
+			if args.a >= np.random.rand():
 				w[i,4:] *= -1.0
 				countflip+=1
 		if E[i] > ecut:
 			if np.dot(L[i,:],ov) < 0.0:
-				if args.oa[1] > np.random.rand():
+				if args.oa[1] >= np.random.rand():
 					w[i,4:] *= -1.0
 					countflip+=1
+		
 
-if args.hs != 0.0:
+elif args.hs != 0.0:
 
 	E = 0.5*np.power(v,2.0) - np.reciprocal(np.sqrt(np.power(x,2.0) + 1.0))
 	L = np.cross(w[:,1:4],w[:,4:])
