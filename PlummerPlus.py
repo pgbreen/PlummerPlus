@@ -562,11 +562,11 @@ for rl in Rbins:
 		vphiavg = np.sum(vphi[rl[zl]])
 		vsign = sign(vphiavg)
 		#mass = np.sum(w[rl[zl],0])
-		vphike += vsign*(vphiavg**2)/len(zl)
+		vphike += (vphiavg**2)/len(zl)
 	#print ""
 
-
-print(" T_phi/|pot| = {:.3e}, (assuming pot = 0.5)".format(-1.0*vphike/args.n))
+#http://adsabs.harvard.edu/abs/1973ApJ...186..467O
+print(" T_phi/|pot| = {:.3e}, (assuming pot = 0.5, see ostriker & peebles 1973)".format(vphike/args.n))
 
 if args.oa[2] >= 0.0:
 	print(" Gamma = {:.3e} (|Ecut/Emin|) ".format(abs(ecut)))

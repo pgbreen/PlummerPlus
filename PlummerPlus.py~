@@ -375,7 +375,6 @@ else:
 #---------------------------------add rotation------------------------------------
 
 countflip = 0
-countflip2 = 0
 if args.oa[2] >= 0.0:
 	# general trick energy cut and 
 	E = 0.5*np.power(v,2.0) - np.reciprocal(np.sqrt(np.power(x,2.0) + 1.0))
@@ -394,8 +393,8 @@ if args.oa[2] >= 0.0:
 			if np.dot(L[i,:],ov) < 0.0:
 				if args.oa[1] >= np.random.rand():
 					w[i,4:] *= -1.0
-					countflip2+=1
-	print(countflip ,countflip2)		
+					countflip+=1
+		
 
 elif args.hs != 0.0:
 
@@ -563,11 +562,11 @@ for rl in Rbins:
 		vphiavg = np.sum(vphi[rl[zl]])
 		vsign = sign(vphiavg)
 		#mass = np.sum(w[rl[zl],0])
-		vphike += vsign*(vphiavg**2)/len(zl)
+		vphike += (vphiavg**2)/len(zl)
 	#print ""
 
 
-print(" T_phi/|pot| = {:.3e}, (assuming pot = 0.5)".format(-1.0*vphike/args.n))
+print(" T_phi/|pot| = {:.3e}, (assuming pot = 0.5, see ostriker & peebles 1973)".format(vphike/args.n))
 
 if args.oa[2] >= 0.0:
 	print(" Gamma = {:.3e} (|Ecut/Emin|) ".format(abs(ecut)))
