@@ -377,8 +377,18 @@ else:
 countflip = 0
 if args.oa[2] >= 0.0:
 	# general trick energy cut and 
-	E = 0.5*np.power(v,2.0) - np.reciprocal(np.sqrt(np.power(x,2.0) + 1.0))
+	v2 = np.sum(np.power(w[:,4:],2.0),axis=1)
+	E = 0.5*v2 - np.reciprocal(np.sqrt(np.power(r,2.0) + 1.0))
+	#E = np.sort(E)
+	#for i in range(args.n):
+	#	print(" {} {} ".format(float(i)/float(args.n),E[i]))
+	#exit()
+
+	#poti = np.reciprocal(np.sqrt(np.power(r,2.0) + 1.0))
 	ecut = np.percentile(E, 100.0*args.oa[2])
+	#print(" {} {} {} {} ".format(max(r),min(r),max(E),min(E)))
+	#exit()
+
 #if args.oa[0] > 0:
 	theta = pi*args.oa[0]/180.0
 	ov = np.array([0.0,sin(theta),cos(theta)])
@@ -397,8 +407,8 @@ if args.oa[2] >= 0.0:
 		
 
 elif args.hs != 0.0:
-
-	E = 0.5*np.power(v,2.0) - np.reciprocal(np.sqrt(np.power(x,2.0) + 1.0))
+	v2 = np.sum(np.power(w[:,4:],2.0),axis=1)
+	E = 0.5*v2 - np.reciprocal(np.sqrt(np.power(r,2.0) + 1.0))
 	L = np.cross(w[:,1:4],w[:,4:])
 
 	# calculation for Lz = 0 high shear models, no long used
@@ -442,7 +452,14 @@ elif args.a > 0:
 
 if args.ms[0] > 0 and args.ms[1] > 0:
 	if args.oa[2] == -1:
-		E = 0.5*np.power(v,2.0) - np.reciprocal(np.sqrt(np.power(x,2.0) + 1.0))
+		E = 0.5*np.power(v,2.0) - np.reciprocal(np.sqrt(np.power(r,2.0) + 1.0))
+	#print(max(E),min(E),len(x))
+	#fexit()
+	#E = np.sort(E)
+	#for i in range(len(E)):
+	#	if i % 1000:	
+	#		print(" {} {} ".format(float(i)/args.n,E[i]))
+	#exit()
 	ecut = np.percentile(E, 100.0*args.ms[0])
 		
 	nfold = args.ms[0]*args.n
@@ -565,12 +582,12 @@ for rl in Rbins:
 		vphike += (vphiavg**2)/len(zl)
 	#print ""
 
-
+#http://adsabs.harvard.edu/abs/1973ApJ...186..467O
 print(" T_phi/|pot| = {:.3e}, (assuming pot = 0.5, see ostriker & peebles 1973)".format(vphike/args.n))
 
 if args.oa[2] >= 0.0:
-	print(" Gamma = {:.3e} (|Ecut/Emin|) ".format(abs(ecut)))
-
+	print(" Gamma = {:.3e} (|Ecut/Emin|) ".format(abs(1+ecut)))
+	print("De({:d},{:.2f},{:.3e}) {:.3e}".format(int(args.q),args.a,abs(1.+ecut),args.oa[2]) )
 
 #print command arguments
 commandstring = '\n ';  

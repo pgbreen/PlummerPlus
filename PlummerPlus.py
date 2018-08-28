@@ -451,15 +451,17 @@ elif args.a > 0:
 #-----------------------------handle mass segregation---
 
 if args.ms[0] > 0 and args.ms[1] > 0:
+
 	if args.oa[2] == -1:
-		E = 0.5*np.power(v,2.0) - np.reciprocal(np.sqrt(np.power(r,2.0) + 1.0))
+		v2 = np.sum(np.power(w[:,4:],2.0),axis=1)
+		E = 0.5*v2 - np.reciprocal(np.sqrt(np.power(r,2.0) + 1.0))
 	#print(max(E),min(E),len(x))
 	#fexit()
-	E = np.sort(E)
-	for i in range(len(E)):
-		if i % 1000:	
-			print(" {} {} ".format(float(i)/args.n,E[i]))
-	exit()
+	#E = np.sort(E)
+	#for i in range(len(E)):
+	#	if i % 1000:	
+	#		print(" {} {} ".format(float(i)/args.n,E[i]))
+	#exit()
 	ecut = np.percentile(E, 100.0*args.ms[0])
 		
 	nfold = args.ms[0]*args.n
