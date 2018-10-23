@@ -65,11 +65,35 @@ a=1.0
 q=-6.0
 
 #radius range
-ra = np.logspace(-1,2,num=20)
-
+#ra = np.logspace(-1,2,num=20)
+Fq = genDf(q)
 #Henon units scale factors
 lfact=3.0*pi/16.0
 vfact = 1./sqrt(lfact)
+
+def wDF(r, vt, vr):
+	vi2 = vt**2+vr**2
+	return 4.*pi*Fq( pot(r)-0.5*vi2, vt*r )*vt**2
+
+def wDF(vr, vt, r):
+	vi2 = vt**2+vr**2
+	return 4.*pi*Fq( pot(r)-0.5*vi2, vt*r )*vt**2
+
+vphiavg = inte.tplquad(wDF, 0, np.inf, lambda x: 0, lambda x: sqrt(2.*pot(x)),lambda x,y: 0, lambda x,y: sqrt(2.*pot(x)-y**2) )
+print (vfact**2)*8.0*vphiavg[0]
+
+
+
+def wDF(vr, vt, r):
+	
+	vi2 = vt**2+vr**2
+	return Fq( pot(r)-0.5*vi2, vt*r )*vt**2
+
+vphiavg = inte.tplquad(wDF, 0, np.inf, lambda x: 0, lambda x: sqrt(2.*pot(x)),lambda x,y: 0, lambda x,y: sqrt(2.*pot(x)-y**2) )
+print  4.0*pi*vphiavg[0], 1.0/vphiavg[0]
+
+exit()
+
 for r in ra:
 	vesc = sqrt(2.*pot(r))
 	

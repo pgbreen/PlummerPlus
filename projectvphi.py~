@@ -121,6 +121,6 @@ for r in ra:
 	c1 = vfact*8.0*a/dens(r)
 	c2 = vfact*2.*8.0*a/surDens(r)
 		
-	print r*lfact, 0.5*pi*c1*vphiavg[0],vtavg, vphiavg[1] #, c2*vphiavg2[0]
+	print r*lfact, 0.5*pi*c1*vphiavg[0]/vtavg, vphiavg[1] #, c2*vphiavg2[0]
 	#print r*lfact, c1*vphiavg2[0], vphiavg2[1]
 
