@@ -536,6 +536,10 @@ else:
 			break
 
 print(" rh = {:.3e} K.E. = {:.3e} vt^2 = {:.3e} vr^2 = {:.3e} ".format(rh,0.5*(svt2+svr2) ,svt2,svr2))
+
+# 
+# crit val http://adsabs.harvard.edu/abs/1981SvA....25..533P
+# more recent 
 if True:
 #if not args.e:
 	print(" 1-0.5*<vt^2>/<vr^2> = {:.3e} ".format(1.0 - 0.5*svt2/svr2))

@@ -264,7 +264,7 @@ elif  args.ra != 0:
 		if q >= 0:
 			return 0.0
 		sig0 = 1.0/6.0
-		fi = (sqrt(2.0)/(378.0*(pi**3)*sig0))*((-q/sig0)**(7.0/2.0))*( 1.0-(args.ra**-2)+(63.0/4.0)*(args.ra**-2)*(-q/sig0)**(-2))
+		fi = (sqrt(2.0)/(378.0*(pi**3)*sqrt(sig0)))*((-q/sig0)**(7.0/2.0))*( 1.0-(args.ra**-2)+(63.0/4.0)*(args.ra**-2)*(-q/sig0)**(-2))
 
 		assert fi >= 0, " DF negative! {0} r={1} vr,vt={2},{3} E,q={4},{5}".format(fi,r,vr,vt,E,q)		
 		return fi
