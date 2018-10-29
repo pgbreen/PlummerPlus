@@ -60,6 +60,10 @@ parser.add_argument("-n", help="number of particles (default: 1000)",
 parser.add_argument("-rs", help="random number generator seed (default: 101)",
                     type=int,default=101,metavar="rand_seed")
 
+parser.add_argument("-rcut", help="outer cutoff radius",
+                    type=float,default=-1.0,metavar="")
+
+
 parser.add_argument("-o", help="name of output file (default: \"fort.10\")",
                     type=str,default="fort.10",metavar="")
 
@@ -112,7 +116,12 @@ w[:,0] = 1.0/float(args.n)
 
 #---------------------------------generate positions------------------------------------
 
-x = np.random.rand(args.n)
+if args.rcut == -1:
+	x = np.random.rand(args.n)
+else:
+	mcut = args.rcut**3/(args.rcut**2 + 1.0)**1.5
+	x = np.random.uniform(0.0, mcut, args.n)	
+
 r = np.reciprocal(np.sqrt(np.power(x,-2.0/3.0)-1.0))
 
 ctheta = np.random.uniform(-1.,1.0,args.n)
