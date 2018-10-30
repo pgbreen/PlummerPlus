@@ -581,6 +581,8 @@ xi = np.zeros((args.n,3))
 xi[:,0] = w[:,2]
 xi[:,1] = -w[:,1]
 xi = np.divide(xi,np.sqrt(R2)[:,None])
+
+# note xi is unit vector in v_phi direction
 vphi = xi[:,0]*vi[:,0] + xi[:,1]*vi[:,1]
 vphike = 0.0
 for rl in Rbins:
@@ -595,10 +597,13 @@ for rl in Rbins:
 		vsign = sign(vphiavg)
 		#mass = np.sum(w[rl[zl],0])
 		vphike += (vphiavg**2)/len(zl)
+		# note vphiavg  accutally (ns*vphiavg) 
+		# vphike = n*(vphiavg)**2 
+		# divide by n before output
 	#print ""
 
 #http://adsabs.harvard.edu/abs/1973ApJ...186..467O
-print(" T_phi/|pot| = {:.3e}, (assuming pot = 0.5, see ostriker & peebles 1973, 0.14 +/- 0.3)".format(vphike/args.n))
+print(" T_phi/|pot| = {:.3e}, (assuming pot = 0.5, see ostriker & peebles 1973, 0.14 +/- 0.03)".format(vphike/args.n))
 
 if args.oa[2] >= 0.0:
 	print(" Gamma = {:.3e} (|Ecut/Emin|) ".format(abs(1+ecut)))
