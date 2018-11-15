@@ -54,8 +54,12 @@ from math import pi, sqrt, cos, sin
 
 parser = argparse.ArgumentParser(description="Generates anisotropic and rotating models with plummer model density distribution  ")
 
-parser.add_argument("-n", help="number of particles (default: 1000)",
+npar = parser.add_mutually_exclusive_group()
+npar.add_argument("-n", help="number of particles (default: 1000)",
                     type=int,default=1000,metavar="")
+
+npar.add_argument("-nk", help="number of particles in units of 1024, e.g. 32K",
+                    type=int,default=0,metavar="")
 
 parser.add_argument("-rs", help="random number generator seed (default: 101)",
                     type=int,default=101,metavar="rand_seed")
@@ -93,7 +97,8 @@ group.add_argument("-ra", help="anisotropic radius of Osipkov-Merritt radially a
 group.add_argument("-e", help=" Einstein sphere, plummer model with only circular orbits ",
                     action="store_true")
 
-
+parser.add_argument("-qt", help="Quiet start, place replicas of particles at 2*pi/qt intervals in plane of orbit, see Sellwood 1997",
+                    type=int,default=0,metavar="")
 
 
 
@@ -108,10 +113,24 @@ args = parser.parse_args()
 
 np.random.seed(args.rs)
 
-w = np.zeros((args.n, 7))
+if args.nk > 0:
+	args.n = 1024*args.nk
 
-# w[:,0] = mass, w[:,1:4] = x,y,z, w[:,4:] = vx,vy,zx
-w[:,0] = 1.0/float(args.n) 
+
+
+#--------- reduce n to n/qt 
+if args.qt > 1:
+	#only for quiet starts
+	m = 1.0/float(args.n) 
+	args.n = int(args.n/args.qt)
+	w = np.zeros((args.n, 7))
+	# w[:,0] = mass, w[:,1:4] = x,y,z, w[:,4:] = vx,vy,zx
+	w[:,0] = m
+else:
+	# more general case
+	w = np.zeros((args.n, 7))
+	# w[:,0] = mass, w[:,1:4] = x,y,z, w[:,4:] = vx,vy,zx
+	w[:,0] = 1.0/float(args.n) 
  
 
 #---------------------------------generate positions------------------------------------
@@ -133,6 +152,9 @@ w[:,2] = stheta*np.sin(phi)
 w[:,3] = ctheta
 
 w[:,1:4] = w[:,1:4]*r[:,None]
+
+
+
 
 
 #---------------------------------generate velocities------------------------------------
@@ -380,6 +402,49 @@ else:
 	w[:,6] = ctheta
 
 	w[:,4:] = w[:,4:]*v[:,None]
+
+#----------------- quiet start --------
+if args.qt > 1:
+
+	# ref https://en.wikipedia.org/wiki/Euler%E2%80%93Rodrigues_formula
+	def rotation_matrix(axis, theta):
+		axis = np.asarray(axis)
+		axis = axis / sqrt(np.dot(axis, axis))
+		a = cos(theta / 2.0)
+		b, c, d = -axis * sin(theta / 2.0)
+		aa, bb, cc, dd = a * a, b * b, c * c, d * d
+		bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
+		return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
+                     [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
+                     [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
+	
+	qtl = [w]
+	
+	for i in range(1,args.qt):
+		wi = np.zeros_like(w)
+		wi[:,0] = w[:,0]
+		qtl.append(wi)
+	
+	for j in range(args.n):
+		ri = w[i,1:4]
+		vi = w[i,4:]
+		L = np.cross(ri,vi)
+		for i in range(1,args.qt):
+			angi = i*2.*pi/args.qt
+			rotmat = rotation_matrix(L, angi)
+			wi = qtl[i]
+			wi[j,1:4] = np.dot(rotmat, ri)
+			wi[j,4:] = np.dot(rotmat, vi)
+			#print(wi[i,1:4],wi[i,4:])
+			#print(w[i,1:4],w[i,4:])
+			#print(qtl[i][-1],wi[-1])
+			#exit()
+			#print(qtl[i][-1],wi[-1])
+
+	args.n = args.n*args.qt
+	w = np.concatenate(qtl)
+	#print(w[-1])
+	
 
 #---------------------------------add rotation------------------------------------
 

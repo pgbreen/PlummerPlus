@@ -79,6 +79,17 @@ vfact = 1./sqrt(lfact)
 #vphiavg = inte.tplquad(wDF, 0, np.inf, lambda x: 0, lambda x: sqrt(2.*pot(x)),lambda x,y: 0, lambda x,y: sqrt(2.*pot(x)-y**2) )
 #print  (16.0*pi*pi)*vphiavg[0]
 
+Fq = genDf(2.)
+def vphir2(r):
+	def wDF(vr,vt):
+		vi2 = vt**2+vr**2
+		return Fq( pot(r)-0.5*vi2, vt*r )*vt*vt
+	vphiavg3 = inte.dblquad(wDF, 0.0, sqrt(2.*pot(r)), lambda x: 0.0, lambda x: sqrt(2.*pot(r)-x**2))
+	return 8.0*vphiavg3[0]/dens(r)
+
+vphiavg3 = inte.quad(lambda r: r**2*dens(r)*vphir2(r)**2, 0, np.inf)
+print vfact*vfact*4.0*pi*vphiavg3[0]
+
 #def wDF(vr, vt, r):
 #	vi2 = vt**2+vr**2
 #	return Fq( pot(r)-0.5*vi2, vt*r )*vt*r**2*vi2
@@ -114,9 +125,8 @@ for q in [-16, -12, -6, -2, 0, 1,2]:
 	sigr =  (vfact**2)*(16.0*pi*pi)*vr2[0]
 	sigtheta = (vfact**2)*(16.0*pi*pi)*vt2[0]
 	vavg = (vfact)*(32.0*pi)*vphiavg3[0]
-
+	
 	#aval =  (vfact**2)*(3.*pi/16.)*(1./(6.-q))
-
 	#, sigtheta^2 = 0.5*(4.-q)/(2.*(6.-q)) ,  sigr2 = (1./(6.-q)),
 	#f = 1.0 #0.25/sigr
 	print  q, sigr, 0.5*sigtheta, 0.5*sigtheta,  vavg**2
