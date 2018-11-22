@@ -428,8 +428,8 @@ if args.qt > 1:
 		qtl.append(wi)
 	
 	for j in range(args.n):
-		ri = w[i,1:4]
-		vi = w[i,4:]
+		ri = w[j,1:4]
+		vi = w[j,4:]
 		L = np.cross(ri,vi)
 		for i in range(1,args.qt):
 			angi = i*2.*pi/args.qt
