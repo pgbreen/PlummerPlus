@@ -71,6 +71,8 @@ parser.add_argument("-rcut", help="outer cutoff radius",
 parser.add_argument("-o", help="name of output file (default: \"fort.10\")",
                     type=str,default="fort.10",metavar="")
 
+parser.add_argument("-u", help="units (default: \"Henon units\")",
+                    type=str,default="HU",metavar="")
 
 
 # rotation parameters 
@@ -564,10 +566,11 @@ if args.ms[0] > 0 and args.ms[1] > 0:
 #--------------------------------scale to Henon units and save data--------------------------------
 
 # scale to henon units and save data to output file "fort.10" (use -o to rename output)
-lfact=(3.0*pi)/16.0		 
-vfact = 1.0/sqrt(lfact)
-w[:,1:4] *= lfact
-w[:,4:] *= vfact
+if args.u == "HU":
+	lfact=(3.0*pi)/16.0		 
+	vfact = 1.0/sqrt(lfact)
+	w[:,1:4] *= lfact
+	w[:,4:] *= vfact
 
 np.savetxt(args.o, w)
 
@@ -610,7 +613,7 @@ else:
 			break
 
 print(" rh = {:.3e} K.E. = {:.3e} vt^2 = {:.3e} vr^2 = {:.3e} ".format(rh,0.5*(svt2+svr2) ,svt2,svr2))
-
+#print(" Ixx = {:.3e} Iyy = {:.3e} Izz = {:.3e}  ".format((w[:,1]**2).sum(),(w[:,2]**2).sum(),(w[:,3]**2).sum() ))
 # 
 # crit val http://adsabs.harvard.edu/abs/1981SvA....25..533P
 # more recent 
