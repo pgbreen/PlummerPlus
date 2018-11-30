@@ -1,7 +1,15 @@
 PlummerPlus
 ===========
 
-Generates anisotropic and rotation Plummer models, see Breen, Varri & Heggie (2018) for details.
+Generates anisotropic and rotation Plummer models, see Breen, Varri & Heggie (2019) for details.
 
-Ansiotropic models of Dejonghe (1987) and Osipkov–Merritt models with rotation introduced via the Lyden-Bell trick 
 
+### Features
+ - Ansiotropic models of Dejonghe (1987), tangential and radial velocity anisotropy
+ - Osipkov–Merritt model  radial velocity anisotropy
+ - Rotation introduced via the Lyden-Bell trick (and generalisations)
+
+### Todos
+
+ - include embedded Plummer models using Eddington Formula 
+ - Kroupa IMF
