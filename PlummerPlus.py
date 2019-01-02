@@ -8,9 +8,8 @@
 #
 # AUTHOR: Phil Breen, University of Edinburgh
 # 
-# LICENSE:	This program is free software under the GNU General Public
-#               License v3 and comes with ABSOLUTELY NO WARRANTY.
-#               See https://www.gnu.org/licenses/gpl.html for details.
+# LICENSE:	MIT, This program is comes with ABSOLUTELY NO WARRANTY.
+#              
 # 
 # CITATION: Please use Breen, Varri, Heggie 2018 (https://arxiv.org/abs/)
 #
