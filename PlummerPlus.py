@@ -49,7 +49,7 @@ import numpy as np
 import scipy.special as sci
 import sys
 from scipy.interpolate import interp1d
-from math import pi, sqrt, cos, sin
+from math import pi, sqrt, cos, sin, acos
 
 parser = argparse.ArgumentParser(description="Generates anisotropic and rotating models with plummer model density distribution  ")
 
@@ -86,6 +86,13 @@ parser.add_argument("-ms", help="Mass segregated model, set fraction of total ma
 
 parser.add_argument("-hs", help=" defines energy cut hs*pot(0) for counter rotation ",
                    type=float,default=0,metavar="")
+
+
+parser.add_argument("-lcut", help=" cut on Lz/L  ",
+                    type=float,default=[-1,0,0],metavar=("G","AU","AO"),nargs=3)
+
+parser.add_argument("-icut", help=" cut on inclination normalise to range 0-1 (0-90 degrees)",
+                    type=float,default=[-1,0,0],metavar=("G","AU","AO"),nargs=3)
 
 # exclusice arguments for velocity space
 group = parser.add_mutually_exclusive_group()
@@ -450,7 +457,52 @@ if args.qt > 1:
 #---------------------------------add rotation------------------------------------
 
 countflip = 0
-if args.oa[2] >= 0.0:
+
+if args.lcut[0] >= 0.0:
+
+	L = np.cross(w[:,1:4],w[:,4:])
+
+	for i in xrange(args.n):	
+		
+		crit = abs(L[i,2]/np.linalg.norm(L[i,:]))
+		
+		if L[i,2] < 0.0 and crit < args.lcut[0]:
+			
+			if args.lcut[1] >= np.random.rand():
+				w[i,4:] *= -1.0
+				countflip+=1
+
+		if L[i,2] < 0.0 and crit > args.lcut[0]:
+
+			if args.lcut[2] >= np.random.rand():
+				w[i,4:] *= -1.0
+				countflip+=1
+
+
+elif args.icut[0] >= 0.0:
+
+	L = np.cross(w[:,1:4],w[:,4:])
+
+	for i in xrange(args.n):	
+		
+		crit = acos(abs(L[i,2]/np.linalg.norm(L[i,:])))/(pi/2.)
+		
+		if L[i,2] < 0.0 and crit < args.icut[0]:
+			
+			if args.icut[1] >= np.random.rand():
+				w[i,4:] *= -1.0
+				countflip+=1
+
+		if L[i,2] < 0.0 and crit > args.icut[0]:
+
+			if args.icut[2] >= np.random.rand():
+				w[i,4:] *= -1.0
+				countflip+=1
+
+
+
+
+elif args.oa[2] >= 0.0:
 	# general trick energy cut and 
 	v2 = np.sum(np.power(w[:,4:],2.0),axis=1)
 	E = 0.5*v2 - np.reciprocal(np.sqrt(np.power(r,2.0) + 1.0))
